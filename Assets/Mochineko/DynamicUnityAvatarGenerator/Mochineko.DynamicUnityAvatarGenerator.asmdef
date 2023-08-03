@@ -1,0 +1,19 @@
+{
+    "name": "Mochineko.DynamicUnityAvatarGenerator",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ed995982eec04b2e9d304b5b6242945",
+        "GUID:fd228c28e14f1a34cbe508676c914dd7",
+        "GUID:2665a8d13d1b3f18800f46e256720795",
+        "GUID:e0cd26848372d4e5c891c569017e11f1"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
