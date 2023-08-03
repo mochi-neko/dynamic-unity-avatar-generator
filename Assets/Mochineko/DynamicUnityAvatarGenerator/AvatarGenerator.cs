@@ -10,15 +10,35 @@ namespace Mochineko.DynamicUnityAvatarGenerator
     {
         public static IResult<Avatar> GenerateHumanoidAvatar(
             GameObject gameObject,
-            Transform rootBone,
-            IHumanBoneRetriever[] retrievers,
+            IRootBoneRetriever rootBoneRetriever,
+            IHumanBoneRetriever[] humanBoneRetrievers,
             HumanDescriptionParameters parameters)
         {
+            var retrieveRootBoneResult = rootBoneRetriever.Retrieve(gameObject);
+            Transform rootBone;
+            switch (retrieveRootBoneResult)
+            {
+                case ISuccessResult<Transform> retrieveRootBoneSuccess:
+                    rootBone = retrieveRootBoneSuccess.Result;
+                    Log.Debug("[AvatarGenerator] Succeeded to retrieve root bone: {0}.", rootBone.name);
+                    break;
+
+                case IFailureResult<Transform> retrieveRootBoneFailure:
+                    Log.Error("[AvatarGenerator] Failed to retrieve root bone because -> {0}.",
+                        retrieveRootBoneFailure.Message);
+                    return Results.Fail<Avatar>(
+                        $"Failed to retrieve root bone because -> {retrieveRootBoneFailure.Message}");
+
+                default:
+                    Log.Fatal("[AvatarGenerator] Unexpected result: {0}.", nameof(retrieveRootBoneResult));
+                    throw new ResultPatternMatchException(nameof(retrieveRootBoneResult));
+            }
+
             var skeletonBones = ConstructSkeletonBones(rootBone);
             Log.Debug("[AvatarGenerator] Finished to construct {0} skeleton bones from root bone: {1}.",
                 skeletonBones.Length, rootBone.name);
 
-            var constructHumanBonesResult = ConstructHumanBones(skeletonBones, retrievers);
+            var constructHumanBonesResult = ConstructHumanBones(skeletonBones, humanBoneRetrievers);
             HumanBone[] humanBones;
             switch (constructHumanBonesResult)
             {
@@ -32,7 +52,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                     Log.Error("[AvatarGenerator] Failed to construct human bones from {0} skeleton bones.",
                         skeletonBones.Length);
                     return Results.Fail<Avatar>(
-                        $"Failed to generate avatar because -> {constructHumanBonesFailure.Message}");
+                        $"Failed to construct human bones from {skeletonBones.Length} skeleton bones because -> {constructHumanBonesFailure.Message}");
 
                 default:
                     Log.Fatal("[AvatarGenerator] Unexpected result: {0}.", nameof(constructHumanBonesResult));
@@ -56,19 +76,19 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             var avatar = AvatarBuilder.BuildHumanAvatar(gameObject, description);
             if (!avatar.isValid)
             {
-                Log.Error("[AvatarGenerator] Failed to generate avatar because avatar is invalid construction for {0}.",
+                Log.Error("[AvatarGenerator] Avatar is invalid construction for {0}.",
                     gameObject.name);
                 return Results.Fail<Avatar>(
-                    $"Failed to generate avatar because avatar is invalid construction for {gameObject.name}.");
+                    $"Avatar is invalid construction for {gameObject.name}.");
             }
 
             if (!avatar.isHuman)
             {
                 Log.Error(
-                    "[AvatarGenerator] Failed to generate avatar because avatar is not humanoid construction for {0}.",
+                    "[AvatarGenerator] Avatar is not humanoid construction for {0}.",
                     gameObject.name);
                 return Results.Fail<Avatar>(
-                    $"Failed to generate avatar because avatar is not humanoid construction for {gameObject.name}.");
+                    $"Avatar is not humanoid construction for {gameObject.name}.");
             }
 
             Log.Info("[AvatarGenerator] Succeeded to generate humanoid avatar for {0}.", gameObject.name);

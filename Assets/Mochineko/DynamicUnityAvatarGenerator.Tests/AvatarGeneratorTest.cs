@@ -15,20 +15,21 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         public void GenerateHumanoidAvatarTest()
         {
             var (gameObject, rootBone) = CreateHumanoidHierarchy();
-            var retrievers = CreateRetrievers();
+            var rootBoneRetriever = new RegularExpressionRootBoneRetriever(@".*(?i)Hips$");
+            var humanBoneRetrievers = CreateHumanBoneRetrievers();
 
             var avatar = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
-                    rootBone,
-                    retrievers,
+                    rootBoneRetriever,
+                    humanBoneRetrievers,
                     new HumanDescriptionParameters()
                 )
                 .Unwrap();
 
             avatar.isValid.Should().BeTrue();
             avatar.isHuman.Should().BeTrue();
-            avatar.humanDescription.skeleton.Length.Should().Be(22);
-            avatar.humanDescription.human.Length.Should().Be(21); // Does not contain root bone
+            avatar.humanDescription.skeleton.Length.Should().Be(21);
+            avatar.humanDescription.human.Length.Should().Be(21);
 
             Object.Destroy(avatar);
             Object.Destroy(gameObject);
@@ -90,7 +91,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             return (gameObject, root);
         }
 
-        private IHumanBoneRetriever[] CreateRetrievers()
+        private IHumanBoneRetriever[] CreateHumanBoneRetrievers()
         {
             var retrievers = new List<IHumanBoneRetriever>();
 
