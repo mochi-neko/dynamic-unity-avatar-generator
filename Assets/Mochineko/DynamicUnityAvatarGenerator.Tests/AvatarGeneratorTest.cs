@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using FluentAssertions;
+using Mochineko.Relent.Result;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -16,14 +17,21 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             var (gameObject, rootBone) = CreateHumanoidHierarchy();
             var retrievers = CreateRetrievers();
 
-            AvatarGenerator.GenerateHumanoidAvatar(
+            var avatar = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     rootBone,
                     retrievers,
                     new HumanDescriptionParameters()
                 )
-                .Success
-                .Should().BeTrue();
+                .Unwrap();
+
+            avatar.isValid.Should().BeTrue();
+            avatar.isHuman.Should().BeTrue();
+            avatar.humanDescription.skeleton.Length.Should().Be(22);
+            avatar.humanDescription.human.Length.Should().Be(21); // Does not contain root bone
+
+            Object.Destroy(avatar);
+            Object.Destroy(gameObject);
         }
 
         private (GameObject gameObject, Transform rootBone) CreateHumanoidHierarchy()
