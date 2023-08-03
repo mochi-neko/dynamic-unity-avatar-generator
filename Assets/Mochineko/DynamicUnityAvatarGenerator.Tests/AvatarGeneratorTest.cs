@@ -14,7 +14,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         [RequiresPlayMode(true)]
         public void GenerateHumanoidAvatarTest()
         {
-            var (gameObject, rootBone) = CreateHumanoidHierarchy();
+            var gameObject = CreateHumanoidHierarchy();
             var rootBoneRetriever = new RegularExpressionRootBoneRetriever(@".*(?i)Hips$");
             var humanBoneRetrievers = CreateHumanBoneRetrievers();
 
@@ -35,7 +35,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             Object.Destroy(gameObject);
         }
 
-        private (GameObject gameObject, Transform rootBone) CreateHumanoidHierarchy()
+        private GameObject CreateHumanoidHierarchy()
         {
             var gameObject = new GameObject(name: "Root");
             var root = gameObject.transform;
@@ -88,7 +88,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             var rightHand = new GameObject(name: "bone.RightHand");
             rightHand.transform.SetParent(rightLowerArm.transform);
 
-            return (gameObject, root);
+            return gameObject;
         }
 
         private IHumanBoneRetriever[] CreateHumanBoneRetrievers()
