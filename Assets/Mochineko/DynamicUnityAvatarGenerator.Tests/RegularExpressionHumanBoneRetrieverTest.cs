@@ -9,37 +9,58 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
 {
     internal sealed class RegularExpressionHumanBoneRetrieverTest
     {
-        [TestCase(".Hips", @".*Hips$")] // Ends with "Hips" with case sensitive
-        [TestCase("SomeBoneName.Hips", @".*Hips$")]
-        [TestCase(".hips", @".*(?i)Hips$")] // Ends with "Hips" with case insensitive
-        [TestCase("some_bone_name_hips", @".*(?i)Hips$")]
-        [TestCase("Hips.", @"^Hips.*")] // Starts with "Hips" with case sensitive
-        [TestCase("Hips.SomeBoneName", @"^Hips.*")]
-        [TestCase("hips.", @"^(?i)Hips.*")] // Starts with "Hips" with case insensitive
-        [TestCase("hips_some_bone_name", @"^(?i)Hips.*")]
-        [TestCase("Prefix.Hips.Suffix", @".*Hips.*")] // Contains "Hips" with case sensitive
-        [TestCase("prefix_hips_suffix", @".*(?i)Hips.*")] // Contains "Hips" with case insensitive
-        [TestCase(".Head", @".*(?i)(Head|Head1)$")] // Ends with "Head" or "Head1" with case insensitive
-        [TestCase(".Head1", @".*(?i)(Head|Head1)$")]
-        [TestCase(".Head", @".*(?i)Head\d??$")] // Ends with "Head" or plus one number with case insensitive
-        [TestCase(".Head1", @".*(?i)Head\d??$")]
+        // Ends with "Hips" with case sensitive
+        [TestCase(@".*Hips$", "Hips", true)]
+        [TestCase(@".*Hips$", "SomeBoneName.Hips", true)]
+        [TestCase(@".*Hips$", "Hip", false)]
+        [TestCase(@".*Hips$", "HipsX", false)]
+        // Ends with "Hips" with case insensitive
+        [TestCase(@".*(?i)Hips$", "hips", true)]
+        [TestCase(@".*(?i)Hips$", "some_bone_name_hips", true)]
+        [TestCase(@".*(?i)Hips$", "HIPS", true)]
+        // Starts with "Hips" with case sensitive
+        [TestCase(@"^Hips.*", "Hips", true)]
+        [TestCase(@"^Hips.*", "Hips.SomeBoneName", true)]
+        [TestCase(@"^Hips.*", "Hip.SomeBoneName", false)]
+        [TestCase(@"^Hips.*", "XHip", false)]
+        // Starts with "Hips" with case insensitive
+        [TestCase(@"^(?i)Hips.*", "hips", true)]
+        [TestCase(@"^(?i)Hips.*", "hips_some_bone_name", true)]
+        // Contains "Hips" with case sensitive
+        [TestCase(@".*Hips.*", "Prefix.Hips.Suffix", true)]
+        [TestCase(@".*Hips.*", "Prefix.Hips", true)]
+        [TestCase(@".*Hips.*", "Hips.Suffix", true)]
+        [TestCase(@".*Hips.*", "Prefix.hip.Suffix", false)]
+        // Contains "Hips" with case insensitive
+        [TestCase(@".*(?i)Hips.*", "prefix_hips_suffix", true)]
+        // Ends with "Head" or "Head1" with case insensitive
+        [TestCase(@".*(Head|Head1)$", "Head", true)]
+        [TestCase(@".*(Head|Head1)$", "Head1", true)]
+        [TestCase(@".*(Head|Head1)$", "Head2", false)]
+        // Ends with "Head" or plus one number with case insensitive
+        [TestCase(@".*Head\d??$", "Head", true)]
+        [TestCase(@".*Head\d??$", "Head1", true)]
+        [TestCase(@".*Head\d??$", "HeadX", false)]
+        [TestCase(@".*Head\d??$", "Head10", false)]
         [RequiresPlayMode(false)]
-        public void RetrieveTest(string name, string pattern)
+        public void RetrieveTest(string pattern, string name, bool match)
         {
             IHumanBoneRetriever retriever = new RegularExpressionHumanBoneRetriever(
                 target: HumanBodyBones.Hips,
                 limit: new HumanLimit(),
                 pattern: pattern);
 
-            var skeletonBones = new List<SkeletonBone>();
-            skeletonBones.Add(new SkeletonBone()
+            var skeletonBones = new List<SkeletonBone>
             {
-                name = name
-            });
+                new()
+                {
+                    name = name
+                }
+            };
 
             retriever.Retrieve(skeletonBones)
                 .result.Success
-                .Should().BeTrue();
+                .Should().Be(match);
         }
     }
 }
