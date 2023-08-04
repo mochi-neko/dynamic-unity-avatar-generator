@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using FluentAssertions;
+using Mochineko.DynamicUnityAvatarGenerator.Presets;
 using Mochineko.Relent.Result;
 using NUnit.Framework;
 using UnityEngine;
@@ -14,9 +15,9 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         [RequiresPlayMode(true)]
         public void GenerateHumanoidAvatarTest()
         {
-            var gameObject = CreateHumanoidHierarchy();
+            var gameObject = CreateDummyHumanoidHierarchy();
             var rootBoneRetriever = new RegularExpressionRootBoneRetriever(@".*(?i)Hips$");
-            var humanBoneRetrievers = CreateHumanBoneRetrievers();
+            var humanBoneRetrievers = CreateDummyHumanBoneRetrievers();
 
             var avatar = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
@@ -35,7 +36,33 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             Object.Destroy(gameObject);
         }
 
-        private GameObject CreateHumanoidHierarchy()
+        /// <summary>
+        /// See https://docs.readyplayer.me/ready-player-me/api-reference/avatars/full-body-avatars
+        /// </summary>
+        [Test]
+        [RequiresPlayMode(true)]
+        public void ReadyPlayerMeAvatarGenerationTest()
+        {
+            var gameObject = CreateReadyPlayerMeHumanoidHierarchy();
+
+            var avatar = AvatarGenerator.GenerateHumanoidAvatar(
+                    gameObject,
+                    MixamoAndBipedRootBoneRetriever.Preset,
+                    MixamoAndBipedHumanBoneRetrievers.Preset,
+                    HumanDescriptionParametersPreset.Preset
+                )
+                .Unwrap();
+
+            avatar.isValid.Should().BeTrue();
+            avatar.isHuman.Should().BeTrue();
+            avatar.humanDescription.skeleton.Length.Should().Be(32);
+            avatar.humanDescription.human.Length.Should().Be(32);
+
+            Object.Destroy(avatar);
+            Object.Destroy(gameObject);
+        }
+
+        private GameObject CreateDummyHumanoidHierarchy()
         {
             var gameObject = new GameObject(name: "Root");
             var root = gameObject.transform;
@@ -91,7 +118,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             return gameObject;
         }
 
-        private IHumanBoneRetriever[] CreateHumanBoneRetrievers()
+        private IHumanBoneRetriever[] CreateDummyHumanBoneRetrievers()
         {
             var retrievers = new List<IHumanBoneRetriever>();
 
@@ -201,6 +228,90 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
                 pattern: @".*(?i)RightHand$"));
 
             return retrievers.ToArray();
+        }
+
+        /// <summary>
+        /// See https://docs.readyplayer.me/ready-player-me/api-reference/avatars/full-body-avatars
+        /// </summary>
+        /// <returns></returns>
+        private GameObject CreateReadyPlayerMeHumanoidHierarchy()
+        {
+            var gameObject = new GameObject(name: "Armature");
+            var root = gameObject.transform;
+
+            var hips = new GameObject(name: "Hips").transform;
+            hips.SetParent(root);
+
+            var spine = new GameObject(name: "Spine").transform;
+            spine.SetParent(hips);
+            var chest = new GameObject(name: "Spine1").transform;
+            chest.SetParent(spine);
+            var upperChest = new GameObject(name: "Spine2").transform;
+            upperChest.SetParent(chest);
+            var neck = new GameObject(name: "Neck").transform;
+            neck.SetParent(upperChest);
+            var head = new GameObject(name: "Head").transform;
+            head.SetParent(neck);
+
+            var leftUpperLeg = new GameObject(name: "LeftUpLeg").transform;
+            leftUpperLeg.SetParent(hips);
+            var leftLowerLeg = new GameObject(name: "LeftLeg").transform;
+            leftLowerLeg.SetParent(leftUpperLeg);
+            var leftFoot = new GameObject(name: "LeftFoot").transform;
+            leftFoot.SetParent(leftLowerLeg);
+            var leftToes = new GameObject(name: "LeftToeBase").transform;
+            leftToes.SetParent(leftFoot);
+
+            var rightUpperLeg = new GameObject(name: "RightUpLeg").transform;
+            rightUpperLeg.SetParent(hips);
+            var rightLowerLeg = new GameObject(name: "RightLeg").transform;
+            rightLowerLeg.SetParent(rightUpperLeg);
+            var rightFoot = new GameObject(name: "RightFoot").transform;
+            rightFoot.SetParent(rightLowerLeg);
+            var rightToes = new GameObject(name: "RightToeBase").transform;
+            rightToes.SetParent(rightFoot);
+
+            var leftShoulder = new GameObject(name: "LeftShoulder").transform;
+            leftShoulder.SetParent(chest);
+            var leftUpperArm = new GameObject(name: "LeftArm").transform;
+            leftUpperArm.SetParent(leftShoulder);
+            var leftLowerArm = new GameObject(name: "LeftForeArm").transform;
+            leftLowerArm.SetParent(leftUpperArm);
+            var leftHand = new GameObject(name: "LeftHand").transform;
+            leftHand.SetParent(leftLowerArm);
+
+            var rightShoulder = new GameObject(name: "RightShoulder").transform;
+            rightShoulder.SetParent(chest);
+            var rightUpperArm = new GameObject(name: "RightArm").transform;
+            rightUpperArm.SetParent(rightShoulder);
+            var rightLowerArm = new GameObject(name: "RightForeArm").transform;
+            rightLowerArm.SetParent(rightUpperArm);
+            var rightHand = new GameObject(name: "RightHand").transform;
+            rightHand.SetParent(rightLowerArm);
+
+            var leftThumbProximal = new GameObject(name: "LeftHandThumb1").transform;
+            leftThumbProximal.SetParent(leftHand);
+            var leftIndexProximal = new GameObject(name: "LeftHandIndex1").transform;
+            leftIndexProximal.SetParent(leftHand);
+            var leftMiddleProximal = new GameObject(name: "LeftHandMiddle1").transform;
+            leftMiddleProximal.SetParent(leftHand);
+            var leftRingProximal = new GameObject(name: "LeftHandRing1").transform;
+            leftRingProximal.SetParent(leftHand);
+            var leftLittleProximal = new GameObject(name: "LeftHandPinky1").transform;
+            leftLittleProximal.SetParent(leftHand);
+
+            var rightThumbProximal = new GameObject(name: "RightHandThumb1").transform;
+            rightThumbProximal.SetParent(rightHand);
+            var rightIndexProximal = new GameObject(name: "RightHandIndex1").transform;
+            rightIndexProximal.SetParent(rightHand);
+            var rightMiddleProximal = new GameObject(name: "RightHandMiddle1").transform;
+            rightMiddleProximal.SetParent(rightHand);
+            var rightRingProximal = new GameObject(name: "RightHandRing1").transform;
+            rightRingProximal.SetParent(rightHand);
+            var rightLittleProximal = new GameObject(name: "RightHandPinky1").transform;
+            rightLittleProximal.SetParent(rightHand);
+
+            return gameObject;
         }
     }
 }
