@@ -6,8 +6,20 @@ using UnityEngine;
 
 namespace Mochineko.DynamicUnityAvatarGenerator
 {
+    /// <summary>
+    /// Generator of <see cref="Avatar"/> at runtime.
+    /// </summary>
     public static class AvatarGenerator
     {
+        /// <summary>
+        /// Generates a humanoid avatar.
+        /// </summary>
+        /// <param name="gameObject">Root GameObject of the model.</param>
+        /// <param name="rootBoneRetriever">Root bone retriever.</param>
+        /// <param name="humanBoneRetrievers">Human bone retrievers.</param>
+        /// <param name="parameters">Human description parameters.</param>
+        /// <returns></returns>
+        /// <exception cref="ResultPatternMatchException"></exception>
         public static IResult<Avatar> GenerateHumanoidAvatar(
             GameObject gameObject,
             IRootBoneRetriever rootBoneRetriever,
@@ -95,6 +107,11 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             return Results.Succeed(avatar);
         }
 
+        /// <summary>
+        /// Constructs skeleton bones from the root bone.
+        /// </summary>
+        /// <param name="rootBone"></param>
+        /// <returns></returns>
         private static SkeletonBone[] ConstructSkeletonBones(Transform rootBone)
         {
             var bones = new List<SkeletonBone>();
@@ -104,6 +121,11 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             return bones.ToArray();
         }
 
+        /// <summary>
+        /// Creates skeleton bones into children recursively.
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="bones"></param>
         private static void CreateSkeletonBoneRecursively(
             Transform transform,
             ICollection<SkeletonBone> bones)
@@ -124,6 +146,13 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             }
         }
 
+        /// <summary>
+        /// Constructs human bones from skeleton bones.
+        /// </summary>
+        /// <param name="skeletonBones"></param>
+        /// <param name="retrievers"></param>
+        /// <returns></returns>
+        /// <exception cref="ResultPatternMatchException"></exception>
         private static IResult<HumanBone[]> ConstructHumanBones(
             IReadOnlyCollection<SkeletonBone> skeletonBones,
             IEnumerable<IHumanBoneRetriever> retrievers)
@@ -167,10 +196,16 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             return Results.Succeed(humanBones.ToArray());
         }
 
+        /// <summary>
+        /// Whether the part is humanoid required part.
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns></returns>
         private static bool IsHumanoidRequiredPart(HumanBodyBones part)
         {
             switch (part)
             {
+                // Required
                 case HumanBodyBones.Hips:
                 case HumanBodyBones.Spine:
                 case HumanBodyBones.Head:

@@ -1,6 +1,9 @@
 ﻿#nullable enable
 namespace Mochineko.DynamicUnityAvatarGenerator
 {
+    /// <summary>
+    /// Human description parameters other than bones.
+    /// </summary>
     public readonly struct HumanDescriptionParameters
     {
         public readonly float upperArmTwist;

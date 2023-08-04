@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Mochineko.DynamicUnityAvatarGenerator
 {
+    /// <summary>
+    /// Retriever of the root bone of skeleton bones by regular expression.
+    /// </summary>
     public sealed class RegularExpressionRootBoneRetriever : IRootBoneRetriever
     {
         private readonly string pattern;
@@ -15,6 +18,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             this.pattern = pattern;
         }
 
+        /// <inheritdoc/>
         IResult<Transform> IRootBoneRetriever.Retrieve(GameObject gameObject)
         {
             return FindChildRecursively(gameObject.transform, pattern);

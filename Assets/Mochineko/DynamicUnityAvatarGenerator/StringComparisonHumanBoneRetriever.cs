@@ -6,26 +6,22 @@ using UnityEngine;
 
 namespace Mochineko.DynamicUnityAvatarGenerator
 {
+    /// <summary>
+    /// Retriever of human bones from skeleton bones by string comparison.
+    /// </summary>
     public sealed class StringComparisonHumanBoneRetriever : IHumanBoneRetriever
     {
         private readonly HumanBodyBones target;
         private readonly HumanLimit limit;
         private readonly string keyword;
-        public ComparisonMode comparison;
+        private readonly StringComparison comparison;
         private readonly bool caseSensitive;
-
-        public enum ComparisonMode
-        {
-            Prefix,
-            Suffix,
-            Contains,
-        }
 
         public StringComparisonHumanBoneRetriever(
             HumanBodyBones target,
             HumanLimit limit,
             string keyword,
-            ComparisonMode comparison,
+            StringComparison comparison,
             bool caseSensitive)
         {
             if (string.IsNullOrEmpty(keyword))
@@ -40,12 +36,13 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             this.caseSensitive = caseSensitive;
         }
 
+        /// <inheritdoc/>
         (HumanBodyBones part, IResult<HumanBone> result) IHumanBoneRetriever.Retrieve(
             IEnumerable<SkeletonBone> skeletonBones)
         {
             foreach (var bone in skeletonBones)
             {
-                if (CheckPattern(bone.name))
+                if (comparison.MatchRule(bone.name, keyword, caseSensitive))
                 {
                     return (target, Results.Succeed(new HumanBone
                     {
@@ -60,30 +57,6 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                 target,
                 Results.Fail<HumanBone>($"Not found {target} human bone in skeleton bones.")
             );
-        }
-
-        private bool CheckPattern(string name)
-        {
-            switch (comparison)
-            {
-                case ComparisonMode.Prefix:
-                    return caseSensitive
-                        ? name.StartsWith(keyword)
-                        : name.ToLower().StartsWith(keyword.ToLower());
-
-                case ComparisonMode.Suffix:
-                    return caseSensitive
-                        ? name.EndsWith(keyword)
-                        : name.ToLower().EndsWith(keyword.ToLower());
-
-                case ComparisonMode.Contains:
-                    return caseSensitive
-                        ? name.Contains(keyword)
-                        : name.ToLower().Contains(keyword.ToLower());
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(comparison));
-            }
         }
     }
 }

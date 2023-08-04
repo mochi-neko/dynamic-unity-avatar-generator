@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace Mochineko.DynamicUnityAvatarGenerator
 {
+    /// <summary>
+    /// Retriever of human bones from skeleton bones by regular expression.
+    /// </summary>
     public sealed class RegularExpressionHumanBoneRetriever : IHumanBoneRetriever
     {
         private readonly HumanBodyBones target;
@@ -28,6 +31,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
             this.pattern = pattern;
         }
 
+        /// <inheritdoc/>
         (HumanBodyBones part, IResult<HumanBone> result) IHumanBoneRetriever.Retrieve(
             IEnumerable<SkeletonBone> skeletonBones)
         {
@@ -40,7 +44,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                     return (target, Results.Succeed(new HumanBone
                     {
                         boneName = bone.name,
-                        humanName = target.ToString(), // TODO: Check
+                        humanName = target.ToString(),
                         limit = limit
                     }));
                 }
