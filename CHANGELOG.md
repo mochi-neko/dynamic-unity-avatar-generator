@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generic `UnityEngine.Avatar` generator.
 - Settings store by `ScriptableObject`.
 
+## [0.1.1] - 2023-08-04
+
+### Fixed
+- Fix to add parent of root bone to human bones.
+
 ## [0.1.0] - 2023-08-04
 
 ### Added

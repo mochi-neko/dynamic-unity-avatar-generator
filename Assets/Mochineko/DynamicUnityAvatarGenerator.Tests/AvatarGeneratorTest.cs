@@ -29,7 +29,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
 
             avatar.isValid.Should().BeTrue();
             avatar.isHuman.Should().BeTrue();
-            avatar.humanDescription.skeleton.Length.Should().Be(21);
+            avatar.humanDescription.skeleton.Length.Should().Be(22);
             avatar.humanDescription.human.Length.Should().Be(21);
 
             Object.Destroy(avatar);
@@ -55,7 +55,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
 
             avatar.isValid.Should().BeTrue();
             avatar.isHuman.Should().BeTrue();
-            avatar.humanDescription.skeleton.Length.Should().Be(32);
+            avatar.humanDescription.skeleton.Length.Should().Be(33);
             avatar.humanDescription.human.Length.Should().Be(32);
 
             Object.Destroy(avatar);

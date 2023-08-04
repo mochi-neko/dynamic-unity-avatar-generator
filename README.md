@@ -8,7 +8,7 @@ Add following dependencies to your `/Packages/manifest.json`.
 ```json
 {
     "dependencies": {
-        "com.mochineko.dynamic-unity-avatar-generator": "https://github.com/mochi-neko/dynamic-unity-avatar-generator.git?path=/Assets/Mochineko/DynamicUnityAvatarGenerator#0.1.0",
+        "com.mochineko.dynamic-unity-avatar-generator": "https://github.com/mochi-neko/dynamic-unity-avatar-generator.git?path=/Assets/Mochineko/DynamicUnityAvatarGenerator#0.1.1",
         "com.mochineko.relent": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
         "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
         ...
