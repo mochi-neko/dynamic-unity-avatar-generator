@@ -26,12 +26,12 @@ Generates `UnityEngine.Avatar` from 3D model hierarchy at runtime
 - `UnityEngine.Avatar` generator
   - [x] Humanoid
   - [ ] Generic
-- Root bone retriever
+- Root bone retriever (`IRootBoneRetriever`)
   - [x] Regular expression matching
   - [x] String comparison rule
   - [x] Specifying root bone instance
   - [ ] Has most children bones
-- Human bone retriever
+- Human bone retriever (`IHumanBoneRetriever`)
   - [x] Regular expression matching
   - [x] String comparison rule
 
@@ -45,11 +45,11 @@ Regular expression pattern samples are in [RegularExpressionHumanBoneRetrieverTe
 
 Provides some presets of `IRootBoneRetriever`, `IHumanBoneRetriever` and `HumanDescriptionParameters`.
 
-- Root bone retriever
+- Root bone retriever (`IRootBoneRetriever`)
   - Mixamo and Biped preset 
-- Human bone retriever
+- Human bone retriever (`IHumanBoneRetriever`)
   - Mixamo and Biped preset 
-- Human description parameters
+- Human description parameters (`HumanDescriptionParameters`)
   - Sample preset 
 
 See [presets](./Assets/Mochineko/DynamicUnityAvatarGenerator/Presets).
