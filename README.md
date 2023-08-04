@@ -43,6 +43,8 @@ Regular expression pattern samples are in [RegularExpressionHumanBoneRetrieverTe
 
 ## Presets
 
+Provides some presets of `IRootBoneRetriever`, `IHumanBoneRetriever` and `HumanDescriptionParameters`.
+
 - Root bone retriever
   - Mixamo and Biped preset 
 - Human bone retriever
