@@ -116,7 +116,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
         {
             var bones = new List<SkeletonBone>();
 
-            CreateSkeletonBoneRecursively(rootBone, bones);
+            CreateSkeletonBoneRecursively(rootBone.parent, bones);
 
             return bones.ToArray();
         }
