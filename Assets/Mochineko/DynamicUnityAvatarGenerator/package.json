@@ -1,0 +1,18 @@
+{
+    "name": "com.mochineko.dynamic-unity-avatar-generator",
+    "version": "0.1.0",
+    "displayName": "Dynamic Unity Avatar Generator",
+    "description": "Dynamically generates `UnityEngine.Avatar` from skeleton bones at runtime.",
+    "unity": "2022.3",
+    "author": {
+        "name": "Mochineko",
+        "email": "t.o.e.4315@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com:mochi-neko/dynamic-unity-avatar-generator.git"
+    },
+    "dependencies": {
+        "com.unity.logging": "1.0.11"
+    }
+}
