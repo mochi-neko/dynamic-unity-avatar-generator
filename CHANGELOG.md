@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Generic `UnityEngine.Avatar` generator.
 - Settings store by `ScriptableObject`.
+
+## [0.2.0] - 2023-08-05
+
+### Added
+- Add transform map of human bones to result.
+- Add transform map creator from existing `UnityEngine.Avatar`.
 
 ## [0.1.1] - 2023-08-04
 

@@ -1,5 +1,5 @@
 # dynamic-unity-avatar-generator
-Dynamically generates `UnityEngine.Avatar` from skeleton bones at runtime.
+Dynamically generates humanoid `UnityEngine.Avatar` from skeleton bones at runtime.
 
 ## How to import by Unity Package Manager
 
@@ -8,7 +8,7 @@ Add following dependencies to your `/Packages/manifest.json`.
 ```json
 {
     "dependencies": {
-        "com.mochineko.dynamic-unity-avatar-generator": "https://github.com/mochi-neko/dynamic-unity-avatar-generator.git?path=/Assets/Mochineko/DynamicUnityAvatarGenerator#0.1.1",
+        "com.mochineko.dynamic-unity-avatar-generator": "https://github.com/mochi-neko/dynamic-unity-avatar-generator.git?path=/Assets/Mochineko/DynamicUnityAvatarGenerator#0.2.0",
         "com.mochineko.relent": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
         "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
         ...
@@ -18,14 +18,12 @@ Add following dependencies to your `/Packages/manifest.json`.
 
 ## Features
 
-Generates `UnityEngine.Avatar` from 3D model hierarchy at runtime
+Generates `UnityEngine.Avatar` from humanoid 3D model hierarchy at runtime
  with specifying skeleton root bone retrieval logic (`IRootBoneRetriever`),
  human bone retrieval logic (`IHumanBoneRetriever`)
  and other parameters of `HumanDescription` (`HumanDescriptionParameters`).
 
 - `UnityEngine.Avatar` generator
-  - [x] Humanoid
-  - [ ] Generic
 - Root bone retriever (`IRootBoneRetriever`)
   - [x] Regular expression matching
   - [x] String comparison rule
@@ -34,6 +32,7 @@ Generates `UnityEngine.Avatar` from 3D model hierarchy at runtime
 - Human bone retriever (`IHumanBoneRetriever`)
   - [x] Regular expression matching
   - [x] String comparison rule
+- Human bone transform map creator from `UnityEngine.Avatar`.
 
 ## How to use
 
