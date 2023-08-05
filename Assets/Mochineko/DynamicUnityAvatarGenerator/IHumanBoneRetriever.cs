@@ -13,7 +13,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
         /// <summary>
         /// Retrieves human bone from skeleton bones.
         /// </summary>
-        /// <param name="skeletonBones">Skeleton bones.</param>
+        /// <param name="skeletonBones"></param>
         /// <returns></returns>
         (HumanBodyBones part, IResult<(HumanBone humanBone, Transform transform)> result)
             Retrieve(IEnumerable<(SkeletonBone skeletonBone, Transform transform)> skeletonBones);
