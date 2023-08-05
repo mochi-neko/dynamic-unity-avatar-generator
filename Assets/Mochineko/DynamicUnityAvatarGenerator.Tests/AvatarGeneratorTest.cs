@@ -19,7 +19,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             var rootBoneRetriever = new RegularExpressionRootBoneRetriever(@".*(?i)Hips$");
             var humanBoneRetrievers = CreateDummyHumanBoneRetrievers();
 
-            var avatar = AvatarGenerator.GenerateHumanoidAvatar(
+            var (avatar, map) = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     rootBoneRetriever,
                     humanBoneRetrievers,
@@ -31,6 +31,9 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             avatar.isHuman.Should().BeTrue();
             avatar.humanDescription.skeleton.Length.Should().Be(22);
             avatar.humanDescription.human.Length.Should().Be(21);
+            avatar.humanDescription.human.Length.Should().Be(map.Count);
+
+            map[HumanBodyBones.Hips].transform.name.Should().Be("bone.Hips");
 
             Object.Destroy(avatar);
             Object.Destroy(gameObject);
@@ -45,7 +48,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         {
             var gameObject = CreateReadyPlayerMeHumanoidHierarchy();
 
-            var avatar = AvatarGenerator.GenerateHumanoidAvatar(
+            var (avatar, map) = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     MixamoAndBipedRootBoneRetriever.Preset,
                     MixamoAndBipedHumanBoneRetrievers.Preset,
@@ -57,6 +60,9 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
             avatar.isHuman.Should().BeTrue();
             avatar.humanDescription.skeleton.Length.Should().Be(33);
             avatar.humanDescription.human.Length.Should().Be(32);
+            avatar.humanDescription.human.Length.Should().Be(map.Count);
+
+            map[HumanBodyBones.Hips].transform.name.Should().Be("Hips");
 
             Object.Destroy(avatar);
             Object.Destroy(gameObject);

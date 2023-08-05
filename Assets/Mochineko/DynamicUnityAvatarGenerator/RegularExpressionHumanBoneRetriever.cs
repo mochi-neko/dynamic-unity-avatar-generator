@@ -32,27 +32,35 @@ namespace Mochineko.DynamicUnityAvatarGenerator
         }
 
         /// <inheritdoc/>
-        (HumanBodyBones part, IResult<HumanBone> result) IHumanBoneRetriever.Retrieve(
-            IEnumerable<SkeletonBone> skeletonBones)
+        (HumanBodyBones part, IResult<(HumanBone humanBone, Transform transform)> result)
+            IHumanBoneRetriever.Retrieve(
+                IEnumerable<(SkeletonBone skeletonBone, Transform transform)> skeletonBones)
         {
             var regex = new Regex(pattern);
 
             foreach (var bone in skeletonBones)
             {
-                if (regex.IsMatch(bone.name))
+                if (regex.IsMatch(bone.skeletonBone.name))
                 {
-                    return (target, Results.Succeed(new HumanBone
-                    {
-                        boneName = bone.name,
-                        humanName = target.ToString(),
-                        limit = limit
-                    }));
+                    return (
+                        target,
+                        Results.Succeed((
+                            new HumanBone
+                            {
+                                boneName = bone.skeletonBone.name,
+                                humanName = target.ToString(),
+                                limit = limit
+                            },
+                            bone.transform
+                        ))
+                    );
                 }
             }
 
             return (
                 target,
-                Results.Fail<HumanBone>($"Not found {target} human bone in skeleton bones.")
+                Results.Fail<(HumanBone humanBone, Transform transform)>(
+                    $"Not found {target} human bone in skeleton bones.")
             );
         }
     }

@@ -42,7 +42,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         [TestCase(@".*Head\d??$", "Head1", true)]
         [TestCase(@".*Head\d??$", "HeadX", false)]
         [TestCase(@".*Head\d??$", "Head10", false)]
-        [RequiresPlayMode(false)]
+        [RequiresPlayMode(true)]
         public void RetrieveTest(string pattern, string name, bool match)
         {
             IHumanBoneRetriever retriever = new RegularExpressionHumanBoneRetriever(
@@ -50,12 +50,12 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
                 limit: new HumanLimit(),
                 pattern: pattern);
 
-            var skeletonBones = new List<SkeletonBone>
+            var skeletonBones = new List<(SkeletonBone, Transform)>
             {
-                new()
-                {
-                    name = name
-                }
+                (
+                    new SkeletonBone { name = name },
+                    new GameObject().transform
+                )
             };
 
             retriever.Retrieve(skeletonBones)
