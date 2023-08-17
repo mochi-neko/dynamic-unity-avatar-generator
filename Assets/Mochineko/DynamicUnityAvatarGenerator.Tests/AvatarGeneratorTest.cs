@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 using FluentAssertions;
 using Mochineko.DynamicUnityAvatarGenerator.Presets;
 using Mochineko.Relent.Result;
@@ -12,19 +13,19 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
     {
         [Test]
         [RequiresPlayMode(true)]
-        public void GenerateHumanoidAvatarTest()
+        public async Task GenerateHumanoidAvatarTest()
         {
             var gameObject = DummySkeletonCreator.CreateDummyHumanoidHierarchy();
             var rootBoneRetriever = new RegularExpressionRootBoneRetriever(@".*(?i)Hips$");
             var humanBoneRetrievers = DummySkeletonCreator.CreateDummyHumanBoneRetrievers();
 
-            var (avatar, map) = AvatarGenerator.GenerateHumanoidAvatar(
+            var (avatar, map) = (await AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     rootBoneRetriever,
                     humanBoneRetrievers,
                     new HumanDescriptionParameters()
                 )
-                .Unwrap();
+                ).Unwrap();
 
             avatar.isValid.Should().BeTrue();
             avatar.isHuman.Should().BeTrue();
@@ -52,16 +53,16 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         /// </summary>
         [Test]
         [RequiresPlayMode(true)]
-        public void ReadyPlayerMeAvatarGenerationTest()
+        public async Task ReadyPlayerMeAvatarGenerationTest()
         {
             var gameObject = DummySkeletonCreator.CreateReadyPlayerMeHumanoidHierarchy();
 
-            var (avatar, map) = AvatarGenerator.GenerateHumanoidAvatar(
+            var (avatar, map) = (await AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     MixamoAndBipedRootBoneRetriever.Preset,
                     MixamoAndBipedHumanBoneRetrievers.Preset,
                     HumanDescriptionParametersPreset.Preset
-                )
+                ))
                 .Unwrap();
 
             avatar.isValid.Should().BeTrue();

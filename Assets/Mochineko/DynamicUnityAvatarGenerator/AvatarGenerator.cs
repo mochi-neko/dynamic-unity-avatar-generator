@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Mochineko.Relent.Result;
 using Unity.Logging;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace Mochineko.DynamicUnityAvatarGenerator
         /// <param name="parameters">Human description parameters.</param>
         /// <returns></returns>
         /// <exception cref="ResultPatternMatchException"></exception>
-        public static IResult<(Avatar avatar, IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)>
+        public static async UniTask<IResult<(Avatar avatar, IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)>>
             GenerateHumanoidAvatar(
                 GameObject gameObject,
                 IRootBoneRetriever rootBoneRetriever,
@@ -84,6 +85,9 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                 {
                     pair.Value.localRotation = TPoseLocalRotation(pair.Key);
                 }
+
+                // NOTE: Wait to apply transform.
+                await UniTask.DelayFrame(delayFrameCount: 1);
             }
 
             var description = new HumanDescription
