@@ -26,7 +26,8 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                 GameObject gameObject,
                 IRootBoneRetriever rootBoneRetriever,
                 IHumanBoneRetriever[] humanBoneRetrievers,
-                HumanDescriptionParameters parameters)
+                HumanDescriptionParameters parameters,
+                bool enforceTPose = false)
         {
             var retrieveRootBoneResult = rootBoneRetriever.Retrieve(gameObject);
             Transform rootBone;
@@ -75,6 +76,14 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                 default:
                     Log.Fatal("[AvatarGenerator] Unexpected result: {0}.", nameof(constructHumanBonesResult));
                     throw new ResultPatternMatchException(nameof(constructHumanBonesResult));
+            }
+
+            if (enforceTPose)
+            {
+                foreach (var pair in transformMap)
+                {
+                    pair.Value.localRotation = TPoseLocalRotation(pair.Key);
+                }
             }
 
             var description = new HumanDescription
@@ -254,6 +263,29 @@ namespace Mochineko.DynamicUnityAvatarGenerator
 
                 default:
                     return false;
+            }
+        }
+
+        private static Quaternion TPoseLocalRotation(HumanBodyBones part)
+        {
+            switch (part)
+            {
+                case HumanBodyBones.Hips:
+                    return Quaternion.Euler(new Vector3(90f, 0f, 0f));
+                case HumanBodyBones.LeftUpperLeg:
+                    return Quaternion.Euler(new Vector3(0f, 0f, 180f));
+                case HumanBodyBones.LeftFoot:
+                    return Quaternion.Euler(new Vector3(90f, 0f, 0f));
+                case HumanBodyBones.RightUpperLeg:
+                    return Quaternion.Euler(new Vector3(0f, 0f, -180f));
+                case HumanBodyBones.RightFoot:
+                    return Quaternion.Euler(new Vector3(90f, 0f, 0f));
+                case HumanBodyBones.LeftShoulder:
+                    return Quaternion.Euler(new Vector3(90f, -90f, 0f));
+                case HumanBodyBones.RightShoulder:
+                    return Quaternion.Euler(new Vector3(90f, 90f, 0f));
+                default:
+                    return Quaternion.identity;
             }
         }
     }
