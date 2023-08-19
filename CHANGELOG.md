@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Settings store by `ScriptableObject`.
+## [0.2.1] - 2023-08-19
+
+### Fixed
+- Enforce skeleton bones on T-pose before building `UnityEngine.Avatar`.
 
 ## [0.2.0] - 2023-08-05
 
