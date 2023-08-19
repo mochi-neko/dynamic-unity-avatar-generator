@@ -22,13 +22,12 @@ namespace Mochineko.DynamicUnityAvatarGenerator
         /// <param name="parameters">Human description parameters.</param>
         /// <returns></returns>
         /// <exception cref="ResultPatternMatchException"></exception>
-        public static async UniTask<IResult<(Avatar avatar, IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)>>
+        public static IResult<(Avatar avatar, IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)>
             GenerateHumanoidAvatar(
                 GameObject gameObject,
                 IRootBoneRetriever rootBoneRetriever,
                 IHumanBoneRetriever[] humanBoneRetrievers,
-                HumanDescriptionParameters parameters,
-                bool enforceTPose = false)
+                HumanDescriptionParameters parameters)
         {
             var retrieveRootBoneResult = rootBoneRetriever.Retrieve(gameObject);
             Transform rootBone;
@@ -50,11 +49,11 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                     throw new ResultPatternMatchException(nameof(retrieveRootBoneResult));
             }
 
-            var skeletonBones = ConstructSkeletonBones(rootBone);
+            var skeletonBoneInfo = ConstructSkeletonBones(rootBone);
             Log.Debug("[AvatarGenerator] Finished to construct {0} skeleton bones from root bone: {1}.",
-                skeletonBones.Length, rootBone.name);
+                skeletonBoneInfo.Length, rootBone.name);
 
-            var constructHumanBonesResult = ConstructHumanBones(skeletonBones, humanBoneRetrievers);
+            var constructHumanBonesResult = ConstructHumanBones(skeletonBoneInfo, humanBoneRetrievers);
             HumanBone[] humanBones;
             IReadOnlyDictionary<HumanBodyBones, Transform> transformMap;
             switch (constructHumanBonesResult)
@@ -64,38 +63,33 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                     humanBones = constructHumanBonesSuccess.Result.bones;
                     transformMap = constructHumanBonesSuccess.Result.map;
                     Log.Debug("[AvatarGenerator] Succeeded to construct {0} human bones from {1} skeleton bones.",
-                        humanBones.Length, skeletonBones.Length);
+                        humanBones.Length, skeletonBoneInfo.Length);
                     break;
 
                 case IFailureResult<(HumanBone[], IReadOnlyDictionary<HumanBodyBones, Transform>)>
                     constructHumanBonesFailure:
                     Log.Error("[AvatarGenerator] Failed to construct human bones from {0} skeleton bones.",
-                        skeletonBones.Length);
+                        skeletonBoneInfo.Length);
                     return Results.Fail<(Avatar, IReadOnlyDictionary<HumanBodyBones, Transform>)>(
-                        $"Failed to construct human bones from {skeletonBones.Length} skeleton bones because -> {constructHumanBonesFailure.Message}");
+                        $"Failed to construct human bones from {skeletonBoneInfo.Length} skeleton bones because -> {constructHumanBonesFailure.Message}");
 
                 default:
                     Log.Fatal("[AvatarGenerator] Unexpected result: {0}.", nameof(constructHumanBonesResult));
                     throw new ResultPatternMatchException(nameof(constructHumanBonesResult));
             }
 
-            if (enforceTPose)
-            {
-                foreach (var pair in transformMap)
-                {
-                    pair.Value.localRotation = TPoseLocalRotation(pair.Key);
-                }
+            var skeletonBones = skeletonBoneInfo
+                .Select(pair => pair.skeletonBone)
+                .ToArray();
 
-                // NOTE: Wait to apply transform.
-                await UniTask.DelayFrame(delayFrameCount: 1);
-            }
+            EnforceSkeletonBonesOnTPose(skeletonBones, transformMap);
+            Log.Info("[AvatarGenerator] Succeeded to enforce skeleton bones on T-Pose for {0} before building avatar.",
+                gameObject.name);
 
             var description = new HumanDescription
             {
                 human = humanBones,
-                skeleton = skeletonBones
-                    .Select(pair => pair.skeletonBone)
-                    .ToArray(),
+                skeleton = skeletonBones,
                 upperArmTwist = parameters.upperArmTwist,
                 lowerArmTwist = parameters.lowerArmTwist,
                 upperLegTwist = parameters.upperLegTwist,
@@ -178,13 +172,15 @@ namespace Mochineko.DynamicUnityAvatarGenerator
         /// <param name="retrievers"></param>
         /// <returns></returns>
         /// <exception cref="ResultPatternMatchException"></exception>
-        private static IResult<(HumanBone[] humanBones, IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)>
+        private static IResult<(
+                HumanBone[] humanBones,
+                IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)>
             ConstructHumanBones(
                 IReadOnlyCollection<(SkeletonBone skeletonBone, Transform transform)> skeletonBones,
                 IEnumerable<IHumanBoneRetriever> retrievers)
         {
             var humanBones = new List<HumanBone>();
-            var map = new Dictionary<HumanBodyBones, Transform>();
+            var transformMap = new Dictionary<HumanBodyBones, Transform>();
 
             foreach (var retriever in retrievers)
             {
@@ -192,12 +188,12 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                 switch (result)
                 {
                     case ISuccessResult<(HumanBone bone, Transform transform)> success:
-                        if (!map.ContainsKey(part))
+                        if (!transformMap.ContainsKey(part))
                         {
                             Log.Debug("[AvatarGenerator] Succeeded to retrieve human bone {0} as {1}.",
                                 success.Result.bone.boneName, success.Result.bone.humanName);
                             humanBones.Add(success.Result.bone);
-                            map.Add(part, success.Result.transform);
+                            transformMap.Add(part, success.Result.transform);
                             continue;
                         }
                         else
@@ -234,8 +230,30 @@ namespace Mochineko.DynamicUnityAvatarGenerator
 
             return Results.Succeed<(HumanBone[], IReadOnlyDictionary<HumanBodyBones, Transform>)>((
                 humanBones.ToArray(),
-                map
+                transformMap
             ));
+        }
+
+        /// <summary>
+        /// Enforces T-Pose to the skeleton bones.
+        /// </summary>
+        /// <param name="skeletonBones">Skeleton bones.</param>
+        /// <param name="transformMap">Transform map of human bones.</param>
+        private static void EnforceSkeletonBonesOnTPose(
+            SkeletonBone[] skeletonBones,
+            IReadOnlyDictionary<HumanBodyBones, Transform> transformMap)
+        {
+            foreach (var (part, transform) in transformMap)
+            {
+                for (var i = 0; i < skeletonBones.Length; i++)
+                {
+                    if (skeletonBones[i].name == transform.name)
+                    {
+                        // Override skeleton bone rotation by T-Pose
+                        skeletonBones[i].rotation = TPoseLocalRotation(part);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -265,29 +283,39 @@ namespace Mochineko.DynamicUnityAvatarGenerator
                 case HumanBodyBones.RightFoot:
                     return true;
 
+                // Optional
                 default:
                     return false;
             }
         }
 
+        /// <summary>
+        /// T-Pose local rotation for each human bone part.
+        /// </summary>
+        /// <param name="part">Target part of human bone.</param>
+        /// <returns></returns>
         private static Quaternion TPoseLocalRotation(HumanBodyBones part)
         {
             switch (part)
             {
-                case HumanBodyBones.Hips:
-                    return Quaternion.Euler(new Vector3(90f, 0f, 0f));
                 case HumanBodyBones.LeftUpperLeg:
                     return Quaternion.Euler(new Vector3(0f, 0f, 180f));
+
                 case HumanBodyBones.LeftFoot:
                     return Quaternion.Euler(new Vector3(90f, 0f, 0f));
+
                 case HumanBodyBones.RightUpperLeg:
                     return Quaternion.Euler(new Vector3(0f, 0f, -180f));
+
                 case HumanBodyBones.RightFoot:
                     return Quaternion.Euler(new Vector3(90f, 0f, 0f));
+
                 case HumanBodyBones.LeftShoulder:
                     return Quaternion.Euler(new Vector3(90f, -90f, 0f));
+
                 case HumanBodyBones.RightShoulder:
                     return Quaternion.Euler(new Vector3(90f, 90f, 0f));
+
                 default:
                     return Quaternion.identity;
             }

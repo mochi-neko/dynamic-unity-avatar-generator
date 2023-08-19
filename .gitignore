@@ -74,6 +74,5 @@ crashlytics-build.properties
 # Rider
 .idea
 
-# NuGetForUnity
-/[Aa]ssets/[Pp]ackages/
-/[Aa]ssets/[Pp]ackages.meta
+# macOS
+.DS_Store

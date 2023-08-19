@@ -13,18 +13,17 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
     {
         [Test]
         [RequiresPlayMode(true)]
-        public async Task GenerateHumanoidAvatarTest()
+        public void GenerateHumanoidAvatarTest()
         {
             var gameObject = DummySkeletonCreator.CreateDummyHumanoidHierarchy();
             var rootBoneRetriever = new RegularExpressionRootBoneRetriever(@".*(?i)Hips$");
             var humanBoneRetrievers = DummySkeletonCreator.CreateDummyHumanBoneRetrievers();
 
-            var (avatar, map) = (await AvatarGenerator.GenerateHumanoidAvatar(
+            var (avatar, map) = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     rootBoneRetriever,
                     humanBoneRetrievers,
                     new HumanDescriptionParameters()
-                )
                 ).Unwrap();
 
             avatar.isValid.Should().BeTrue();
@@ -53,16 +52,15 @@ namespace Mochineko.DynamicUnityAvatarGenerator.Tests
         /// </summary>
         [Test]
         [RequiresPlayMode(true)]
-        public async Task ReadyPlayerMeAvatarGenerationTest()
+        public void ReadyPlayerMeAvatarGenerationTest()
         {
             var gameObject = DummySkeletonCreator.CreateReadyPlayerMeHumanoidHierarchy();
 
-            var (avatar, map) = (await AvatarGenerator.GenerateHumanoidAvatar(
+            var (avatar, map) = AvatarGenerator.GenerateHumanoidAvatar(
                     gameObject,
                     MixamoAndBipedRootBoneRetriever.Preset,
                     MixamoAndBipedHumanBoneRetrievers.Preset,
-                    HumanDescriptionParametersPreset.Preset
-                ))
+                    HumanDescriptionParametersPreset.Preset)
                 .Unwrap();
 
             avatar.isValid.Should().BeTrue();
