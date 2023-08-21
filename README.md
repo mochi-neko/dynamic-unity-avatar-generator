@@ -23,7 +23,7 @@ Generates `UnityEngine.Avatar` from humanoid 3D model hierarchy at runtime
  human bone retrieval logic (`IHumanBoneRetriever`)
  and other parameters of `HumanDescription` (`HumanDescriptionParameters`).
 
-- `UnityEngine.Avatar` generator
+- Humanoid `UnityEngine.Avatar` generator
 - Root bone retriever (`IRootBoneRetriever`)
   - [x] Regular expression matching
   - [x] String comparison rule
@@ -32,7 +32,7 @@ Generates `UnityEngine.Avatar` from humanoid 3D model hierarchy at runtime
 - Human bone retriever (`IHumanBoneRetriever`)
   - [x] Regular expression matching
   - [x] String comparison rule
-- Human bone transform map creator from `UnityEngine.Avatar`.
+- Human bone transform map `IReadOnlyDictionary<HumanBodyBones, Transform>` creator from `UnityEngine.Avatar`.
 
 ## How to use
 
